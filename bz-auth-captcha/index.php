@@ -15,6 +15,8 @@ class Captcha{
 
 		add_action('login_form', [$this, 'bz_auth_captcha']);
 		add_action('wp_head', [$this, 'bz_generate_captcha_values']);
+		add_action('init', [$this, 'bz_start_session'], 1);
+
 		add_filter('authenticate', [$this, 'wp_auth_signon'], 30, 3);	
 	}
 
@@ -23,6 +25,12 @@ class Captcha{
 		$this->bz_generate_captcha_values();
 
 		echo $this->bz_locate_captcha();		
+	}
+
+	function bz_start_session(){
+
+		if (!session_id())
+    		session_start();
 	}
 
 	function wp_auth_signon($user, $username, $password){
@@ -47,18 +55,12 @@ class Captcha{
 
 	function bz_generate_captcha_values(){
 
-		if (!session_id())
-    		session_start();
-
 		$_SESSION['captcha_1'] = rand(1, 10);
 		$_SESSION['captcha_2'] = rand(1, 10);
 		$_SESSION['captcha_res'] = $_SESSION['captcha_1'] + $_SESSION['captcha_2'];
 	}
 
 	function bz_check_captcha(){
-
-		if (!session_id())
-    		session_start();
 
     	if(!isset($_POST['captcha'])){
     		return 0;
@@ -79,9 +81,6 @@ class Captcha{
 	}
 
 	function bz_locate_captcha(){
-
-		if (!session_id())
-    		session_start();
 
 		return '<p class="">
 							<label for="captcha">Captcha <span class="required">*</span></label>
